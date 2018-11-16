@@ -16,8 +16,22 @@ def mean(values):
 			sum += value
 	return sum/count(values)
 
+def sqrt(value):
+	if (value < 0):
+		return 0
+	sqrt = 0
+	while (sqrt * sqrt < value):
+		sqrt += 1
+	return sqrt
+
 def std(values):
-	return 2.00
+	summ = 0
+	meanValue = mean(values)
+	for value in values:
+		if (~np.isnan(value)):
+			summ += ((value - meanValue) ** 2) 
+	result = sqrt((1 / count(values)) * summ)
+	return result
 
 def minimum(values):
 	min = None
@@ -44,7 +58,7 @@ def percentile(values, percentile):
 	index = 0
 	for value in values:
 		if (index == number):
-			return values[index]
+			return 0#values[index]
 		if (~np.isnan(value)):
 			index += 1
 	return 0
@@ -79,6 +93,7 @@ def main():
 		subjectDatas = tools.getSubjectDatas(datas)
 		if (subjectDatas is None):
 			sys.exit(1)
+		print subjectDatas.describe()
 		describe(subjectDatas)
 	else:
 		print 'Error script : python describe.py file.'
