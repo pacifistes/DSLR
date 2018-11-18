@@ -16,6 +16,7 @@ def main():
 		subjectDatas = subjectDatas.dropna()
 		replacements = {data : data[:4] for data in subjectDatas if data != 'Hogwarts House'}
 		g = sns.pairplot(subjectDatas, hue="Hogwarts House", hue_order=csv.houseNames, palette=csv.colors, height=1.5, plot_kws={"s": 5})
+		# g = sns.pairplot(subjectDatas, hue="Hogwarts House", hue_order=csv.houseNames, palette=csv.colors, height=1.5, plot_kws={"s": 5}, diag_kind='hist', diag_kws={"alpha":0.5})
 		size = len(subjectDatas.columns) - 1
 		for i in range(size):
 			for j in range(size):
