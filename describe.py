@@ -1,79 +1,11 @@
 #!~/.brew/bin/python
-from __future__ import division
-import tools
-import sys
+import csvTools as csv
+import mathTools as math
 import pandas as pd
-import numpy as np
-
-
-def count(values):
-	return np.count_nonzero(~np.isnan(values))
-
-def mean(values):
-	sum = 0.00
-	for value in values:
-		if (~np.isnan(value)):
-			sum += value
-	return sum/count(values)
-
-def sqrt(value):
-	if (value < 0):
-		return 0
-	sqrt = 0
-	while (sqrt * sqrt < value):
-		sqrt += 1
-	return sqrt
-
-def std(values):
-	summ = 0
-	meanValue = mean(values)
-	for value in values:
-		if (~np.isnan(value)):
-			summ += ((value - meanValue) ** 2) 
-	result = sqrt((1 / count(values)) * summ)
-	return result
-
-def minimum(values):
-	min = None
-	for value in values:
-		if (~np.isnan(value)):
-			if (min is None):
-				min = value
-			elif (value < min):
-				min = value
-	return min
-
-def maximum(values):
-	max = None
-	for value in values:
-		if (~np.isnan(value)):
-			if (max is None):
-				max = value
-			elif (value > max):
-				max = value
-	return max
-
-def percentile(values, percentile):
-	number = int(percentile * count(values))
-	index = 0
-	for value in values:
-		if (index == number):
-			return 0#values[index]
-		if (~np.isnan(value)):
-			index += 1
-	return 0
-
-def quart(values):
-	return percentile(values, 0.25)
-
-def half(values):
-	return percentile(values, 0.5)
-
-def treeQuarts(values):
-	return percentile(values, 0.75)
+import sys
 
 def describeColumn(values):
-	return [count(values), mean(values), std(values), minimum(values), quart(values), half(values), treeQuarts(values), maximum(values)]
+	return [math.count(values), math.mean(values), math.std(values), math.minimum(values), math.quart(values), math.half(values), math.treeQuarts(values), math.maximum(values)]
 
 def describe(datas):
 	dictDescribeData = {}
@@ -82,22 +14,21 @@ def describe(datas):
 		dictDescribeData.update({data : describeColumn(datas[data].values)})
 	describeDatas = pd.DataFrame(dictDescribeData)
 	describeDatas.rename(index = indexNames, inplace = True)
-	print describeDatas
+	return describeDatas
 
 def main():
 	if len(sys.argv) == 2:
-		dataDic = {'name': ['Jason', 'Molly', 'Tina', 'Jake', 'Amy'], 'year': [2012, 2012, 2013, 2014, 2014], 'reports': [4, 24, 31, 2, 3]}
-		datas = tools.readCSVFile(sys.argv[1], ',')
+		datas = csv.readCSVFile(sys.argv[1], ',')
 		if (datas is None):
 			sys.exit(1)
-		subjectDatas = tools.getSubjectDatas(datas)
+		subjectDatas = csv.dropUselessColumn(datas, True)
 		if (subjectDatas is None):
 			sys.exit(1)
-		print subjectDatas.describe()
-		describe(subjectDatas)
+		# print subjectDatas.describe()
+		# print "\n"
+		print describe(subjectDatas)
 	else:
 		print 'Error script : python describe.py file.'
-
 
 if __name__ == "__main__":
 	main()

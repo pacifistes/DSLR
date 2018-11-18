@@ -1,22 +1,21 @@
 #!~/.brew/bin/python
-import tools
+import csvTools as csv
+import mathTools as math
 import sys
 import seaborn as sns
 import matplotlib.pyplot as plt
 
 def main():
 	if len(sys.argv) == 2:
-		datas = tools.readCSVFile(sys.argv[1], ',')
+		datas = csv.readCSVFile(sys.argv[1], ',')
 		if (datas is None):
 			sys.exit(1)
-		subjectDatas = tools.getSubjectDatasWithHouse(datas)
+		subjectDatas = csv.dropUselessColumn(datas, False)
 		if (subjectDatas is None):
 			sys.exit(1)
 		subjectDatas = subjectDatas.dropna()
 		replacements = {data : data[:4] for data in subjectDatas if data != 'Hogwarts House'}
-		houseNames = ['Slytherin', 'Hufflepuff', 'Gryffindor', 'Ravenclaw']
-		colors = ["#33c47f", "#A061D1", "#FF6950", "#4180db"]
-		g = sns.pairplot(subjectDatas, hue="Hogwarts House", hue_order=houseNames, palette=colors, height=1.5, plot_kws={"s": 5})
+		g = sns.pairplot(subjectDatas, hue="Hogwarts House", hue_order=csv.houseNames, palette=csv.colors, height=1.5, plot_kws={"s": 5})
 		size = len(subjectDatas.columns) - 1
 		for i in range(size):
 			for j in range(size):

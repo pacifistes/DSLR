@@ -3,6 +3,10 @@ import csv
 import pandas as pd
 import numpy as np
 
+# Global variables
+houseNames = ['Slytherin', 'Hufflepuff', 'Gryffindor', 'Ravenclaw']
+colors = ["#33c47f", "#A061D1", "#FF6950", "#4180db"]
+
 # Function readCSVFile
 # Params : (String) fileName of the csv file ; (Char) delimiter
 # Return : reader object or None if error
@@ -10,34 +14,30 @@ def readCSVFile(fileName, delimiter):
 	datas = None
 	try:
 		datas = pd.read_csv(fileName, delimiter)
-		# print datas.describe()
 	except IOError:
 		print 'The file doesn\'t exist or is not readable.'
 	except Exception:
 		print 'Error in the file'
 	return datas
 
-# Function getSubjectDatas
-# Params : (Dataframe) datas of the csv file
+# Function dropUselessColumn
+# Params : (Dataframe) datas of the csv file ; (boolean) for dropHouseColumn
 # Return : return the same Dataframe but without non numerical feature
-def getSubjectDatas(datas):
+def dropUselessColumn(datas, dropHouseColumn):
 	subjectDatas = datas
+	columnToDrop = ['Index','First Name','Last Name','Birthday','Best Hand']
+	if (dropHouseColumn == True):
+		columnToDrop.append('Hogwarts House')
 	try:
-		subjectDatas.drop(['Index','Hogwarts House','First Name','Last Name','Birthday','Best Hand'], axis=1, inplace=True)
+		subjectDatas.drop(columnToDrop, axis=1, inplace=True)
 	except Exception:
 		print "One or multiple column beetween: Index,Hogwarts House,First Name,Last Name,Birthday,Best Hand colum doesn't exits"
 		return None
 	return subjectDatas
 
-def getSubjectDatasWithHouse(datas):
-	subjectDatas = datas
-	try:
-		subjectDatas.drop(['Index','First Name','Last Name','Birthday','Best Hand'], axis=1, inplace=True)
-	except Exception:
-		print "One or multiple column beetween: Index,Hogwarts House,First Name,Last Name,Birthday,Best Hand colum doesn't exits"
-		return None
-	return subjectDatas
-
+# Function dropNa 
+# Params : List
+# Return : return the list without nan value
 def dropNa(datas):
 	newDatas = []
 	for data in datas:
@@ -45,25 +45,19 @@ def dropNa(datas):
 			newDatas.append(data)
 	return newDatas
 
-def getSubjectValueByHouse(datas) :
+# Function getSubjectValueByHouse
+# Params : List
+# Return : list of all Subject name and list of value by house by subject
+# Exemple of return :[ [subject1, subject2,...], [ subject1[ House1[ note1, note2, ...], House2[ note1, note2, ...]], subject2[...], ...]]
+def getSubjectValueByHouse(datas):
 	subjectsByHouse = []
 	subjectNames = []
-	houseNames = ['Slytherin', 'Hufflepuff', 'Gryffindor', 'Ravenclaw']
-	colors = ["#33c47f", "#A061D1", "#FF6950", "#4180db"]
-
 	for data in datas:
 		if (data == 'Hogwarts House'):
 			continue
 		subjectNames.append(data)
 		tmpList = []
-		# i = 0
 		for house in houseNames:
 			tmpList.append(dropNa(datas[datas['Hogwarts House'].isin({house})][data].values))
-			# if (i == 0):
-				# print datas[datas['Hogwarts House'].isin({house})][data].values
-			# i += 1
 		subjectsByHouse.append(tmpList)
-	return [subjectNames, subjectsByHouse, houseNames, colors]
-
-def sqrt(value):
-	return 1
+	return [subjectNames, subjectsByHouse]
