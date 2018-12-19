@@ -28,7 +28,7 @@ def main():
 					g.axes[i][j].set_ylabel(replacements[ylabel])
 		plt.show()
 	else:
-		print 'Error script : python pair_plot.py file.'
+		print('Error script : python pair_plot.py file.')
 
 if __name__ == "__main__":
 	main()

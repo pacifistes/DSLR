@@ -28,13 +28,13 @@ def main():
 		if (subjectDatas is None):
 			sys.exit(1)
 		# print subjectDatas.describe()
-		print "Describe general:\n{}\n".format(describe(subjectDatas))
+		print("Describe general:\n{}\n".format(describe(subjectDatas)))
 		if (vlen == 3):
 			for house in csv.houseNames:
-				print "Describe {}:\n{}\n".format(house, describe(subjectDatas.loc[subjectDatas['Hogwarts House'].isin({house})]))
+				print("Describe {}:\n{}\n".format(house, describe(subjectDatas.loc[subjectDatas['Hogwarts House'].isin({house})])))
 
 	else:
-		print 'Error script : python describe.py -byHouse file.'
+		print('Error script : python describe.py -byHouse file.')
 
 if __name__ == "__main__":
 	main()

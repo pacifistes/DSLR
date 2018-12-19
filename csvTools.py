@@ -15,9 +15,9 @@ def readCSVFile(fileName, delimiter):
 	try:
 		datas = pd.read_csv(fileName, delimiter)
 	except IOError:
-		print 'The file doesn\'t exist or is not readable.'
+		print('The file doesn\'t exist or is not readable.')
 	except Exception:
-		print 'Error in the file'
+		print('Error in the file')
 	return datas
 
 # Function dropUselessColumn
@@ -31,7 +31,7 @@ def dropUselessColumn(datas, dropHouseColumn):
 	try:
 		subjectDatas.drop(columnToDrop, axis=1, inplace=True)
 	except Exception:
-		print "One or multiple column beetween: Index,Hogwarts House,First Name,Last Name,Birthday,Best Hand colum doesn't exits"
+		print("One or multiple column beetween: Index,Hogwarts House,First Name,Last Name,Birthday,Best Hand colum doesn't exits")
 		return None
 	return subjectDatas
 

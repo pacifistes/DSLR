@@ -16,7 +16,7 @@ def main():
 		sns.relplot(x="Astronomy", y="Defense Against the Dark Arts", hue="Hogwarts House", hue_order=csv.houseNames, palette=csv.colors, data=subjectDatas)
 		plt.show()
 	else:
-		print 'Error script : python scatter_.py file.'
+		print('Error script : python scatter_.py file.')
 
 if __name__ == "__main__":
 	main()

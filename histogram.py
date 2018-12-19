@@ -34,7 +34,7 @@ def main():
 			elements[0].legend()
 		plt.show()
 	else:
-		print 'Error script : python histogram.py [-all] file.'
+		print('Error script : python histogram.py [-all] file.')
 
 if __name__ == "__main__":
 	main()
