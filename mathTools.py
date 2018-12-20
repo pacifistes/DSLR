@@ -1,6 +1,7 @@
 #!~/.brew/bin/python
 from __future__ import division
 import numpy as np
+import math
 
 def count(values):
 	return np.count_nonzero(~np.isnan(values))
@@ -25,7 +26,7 @@ def sqrt(number):
 		while (value * value <= number): 
 			value += increment
 		value = value - increment 
-		increment = increment / 10    
+		increment = increment / 10
 	return value
 
 def std(values):
@@ -74,5 +75,8 @@ def quart(values):
 def half(values):
 	return percentile(values, 0.5)
 
-def treeQuarts(values):
+def threeQuarts(values):
 	return percentile(values, 0.75)
+
+def	sigmoid(value):
+	return 1 / (1 + math.exp(-value))

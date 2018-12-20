@@ -5,7 +5,7 @@ import pandas as pd
 import sys
 
 def describeColumn(values):
-	return [math.count(values), math.mean(values), math.std(values), math.minimum(values), math.quart(values), math.half(values), math.treeQuarts(values), math.maximum(values)]
+	return [math.count(values), math.mean(values), math.std(values), math.minimum(values), math.quart(values), math.half(values), math.threeQuarts(values), math.maximum(values)]
 
 def describe(datas):
 	dictDescribeData = {}
