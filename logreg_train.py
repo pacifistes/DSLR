@@ -12,7 +12,7 @@ def costFunction(datas):
 	m = len(datas)
 	for data in datas:
 		y = data[1]
-		xSigmoid = sigmoid(data[0])
+		xSigmoid = sigmoid(data[0] * theta)
 		cost = cost + (y * math.log10(xSigmoid) + (1 - y) * math.log10(1 - xSigmoid))
 	return (-1 / m) * cost
 
@@ -24,8 +24,13 @@ def	minimizeCostFunction(datas, theta):
 	for data in datas:
 		x = data[0]
 		y = data[1]
-		cost = cost + ((sigmoid(x) - y) * x)
+		cost = cost + ((sigmoid(theta * x) - y) * x)
 	return theta - ((learningRate / m) * cost)
+
+# Function logit
+# Return: hypothesis of linear Regression
+def	logit(theta0, theta1, x)
+	return theta0 + (theta1 * x)
 
 def	findTheta(datas):
 	theta = 0.0
