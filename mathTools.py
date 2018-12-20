@@ -77,9 +77,3 @@ def half(values):
 
 def threeQuarts(values):
 	return percentile(values, 0.75)
-
-# Function sigmoid
-# Params : (Float) value
-# Return : reader a value between 0 and 1
-def	sigmoid(value):
-	return 1 / (1 + math.e ** -value)
