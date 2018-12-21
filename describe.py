@@ -24,7 +24,7 @@ def main():
 		datas = csv.readCSVFile(sys.argv[vlen - 1], ',')
 		if (datas is None):
 			sys.exit(1)
-		subjectDatas = csv.dropUselessColumn(datas, False)
+		subjectDatas = csv.dropColumns(datas, csv.notArithmetiqueSubjects)
 		if (subjectDatas is None):
 			sys.exit(1)
 		# print subjectDatas.describe()

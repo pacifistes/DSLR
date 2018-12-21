@@ -6,6 +6,8 @@ import numpy as np
 # Global variables
 houseNames = ['Slytherin', 'Hufflepuff', 'Gryffindor', 'Ravenclaw']
 colors = ["#33c47f", "#A061D1", "#FF6950", "#4180db"]
+notArithmetiqueSubjects = ['Index','First Name','Last Name','Birthday','Best Hand']
+ignoredSubjects = nonArithmetiqueSubjects.append('Arithmancy', 'Defense Against the Dark Arts', 'Care of Magical Creatures', 'Transfiguration')
 
 # Function readCSVFile
 # Params : (String) fileName of the csv file ; (Char) delimiter
@@ -20,20 +22,16 @@ def readCSVFile(fileName, delimiter):
 		print('Error in the file')
 	return datas
 
-# Function dropUselessColumn
-# Params : (Dataframe) datas of the csv file ; (boolean) for dropHouseColumn
-# Return : return the same Dataframe but without non numerical feature
-def dropUselessColumn(datas, dropHouseColumn):
-	subjectDatas = datas
-	columnToDrop = ['Index','First Name','Last Name','Birthday','Best Hand']
-	if (dropHouseColumn == True):
-		columnToDrop.append('Hogwarts House')
+# Function dropColumns
+# Params : (Dataframe) datas of the csv file ; list column to drop
+# Return : return the same Dataframe but without the columns drop
+def dropColumns(datas, columns):
 	try:
-		subjectDatas.drop(columnToDrop, axis=1, inplace=True)
+		datas.drop(columns, axis=1, inplace=True)
 	except Exception:
-		print("One or multiple column beetween: Index,Hogwarts House,First Name,Last Name,Birthday,Best Hand colum doesn't exits")
+		print("One or multiple column beetween:", ", ".join(columns), "colum doesn't exits", sep=" ")
 		return None
-	return subjectDatas
+	return datas
 
 # Function dropNa 
 # Params : List
