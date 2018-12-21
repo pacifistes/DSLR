@@ -61,3 +61,23 @@ def getSubjectValueByHouse(datas):
 			tmpList.append(dropNa(datas[datas['Hogwarts House'].isin({house})][data].values))
 		subjectsByHouse.append(tmpList)
 	return [subjectNames, subjectsByHouse]
+
+
+# Function writeCSVFile
+# Params : (String) fileName, [[name1, name2, ...], [value1, value2, ...], [value1, value2, ...], ...]
+# Return : nothing
+def writeCSVFile(fileName, datas):
+	try:
+		with open(fileName, mode='w+') as csv_file:
+			fieldnames = datas[0]
+			writer = csv.DictWriter(csv_file, fieldnames=fieldnames)
+			writer.writeheader()
+			dictionnary = {}
+			for i in range(0, len(datas)):
+				if (i != 0):
+					dictionnary.update({fieldnames[i] : datas[i]})
+			writer.writerow(dictionnary)
+	except Exception:
+		print 'The params must be a float[2].'
+	except IOError:
+		print 'The file thetas.csv isn\'t writable.'
