@@ -7,7 +7,7 @@ import numpy as np
 houseNames = ['Slytherin', 'Hufflepuff', 'Gryffindor', 'Ravenclaw']
 colors = ["#33c47f", "#A061D1", "#FF6950", "#4180db"]
 notArithmetiqueSubjects = ['Index','First Name','Last Name','Birthday','Best Hand']
-ignoredSubjects = notArithmetiqueSubjects + ['Arithmancy', 'Defense Against the Dark Arts', 'Care of Magical Creatures', 'Transfiguration']
+ignoredSubjects = notArithmetiqueSubjects + ['Arithmancy', 'Defense Against the Dark Arts', 'Care of Magical Creatures', 'Transfiguration', 'Potions', 'Flying', 'Charms']
 
 # Function readCSVFile
 # Params : (String) fileName of the csv file ; (Char) delimiter
