@@ -46,6 +46,7 @@ def	train_prediction(datas):
 
 	houseColumns = datas['Hogwarts House']
 	houseNames = datas['Hogwarts House'].unique()
+	print(houseNames)
 	datas.drop('Hogwarts House', axis=1, inplace=True)
 	subjectColumns = datas
 	for iteration in range(30):
