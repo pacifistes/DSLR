@@ -7,7 +7,7 @@ import numpy as np
 houseNames = ['Slytherin', 'Hufflepuff', 'Gryffindor', 'Ravenclaw']
 colors = ["#33c47f", "#A061D1", "#FF6950", "#4180db"]
 notArithmetiqueSubjects = ['Index','First Name','Last Name','Birthday','Best Hand']
-ignoredSubjects = nonArithmetiqueSubjects.append('Arithmancy', 'Defense Against the Dark Arts', 'Care of Magical Creatures', 'Transfiguration')
+ignoredSubjects = notArithmetiqueSubjects + ['Arithmancy', 'Defense Against the Dark Arts', 'Care of Magical Creatures', 'Transfiguration']
 
 # Function readCSVFile
 # Params : (String) fileName of the csv file ; (Char) delimiter
@@ -29,7 +29,7 @@ def dropColumns(datas, columns):
 	try:
 		datas.drop(columns, axis=1, inplace=True)
 	except Exception:
-		print("One or multiple column beetween:", ", ".join(columns), "colum doesn't exits", sep=" ")
+		print("One or multiple column beetween:", ", ".join(columns), "colum doesn't exits")
 		return None
 	return datas
 
@@ -70,12 +70,17 @@ def writeCSVFile(fileName, datas):
 			fieldnames = datas[0]
 			writer = csv.DictWriter(csv_file, fieldnames=fieldnames)
 			writer.writeheader()
-			dictionnary = {}
-			for i in range(0, len(datas)):
-				if (i != 0):
-					dictionnary.update({fieldnames[i] : datas[i]})
-			writer.writerow(dictionnary)
-	except Exception:
-		print 'The params must be a float[2].'
+			lines = []
+			for line in range(len(datas)):
+				if line == 0:
+					continue
+				dictionnary = {}
+				for column in range(len(datas[line])):
+					dictionnary.update({fieldnames[column] : datas[line][column]})
+				lines.append(dictionnary)
+			writer.writerows(lines)
+	except Exception as e:
+		print('The params must be float values.')
+		print(e)
 	except IOError:
-		print 'The file thetas.csv isn\'t writable.'
+		print('The file thetas.csv isn\'t writable.')
