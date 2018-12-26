@@ -4,6 +4,7 @@ import math as m
 import sys
 import csvTools as csv
 import mathTools as math
+import numpy as np
 
 # Function sigmoid
 # Params : (Float) value
@@ -35,7 +36,7 @@ def	minimizeCostFunction(houseColumns, subjectColumns, thetas, learningRate, siz
 
 def	train_prediction(datas):
 	learningRate = 0.1
-	precision = 0.01
+	precision = 0.1
 	if ('Hogwarts House' not in datas):
 		return None
 	nbr_subject = len(datas.columns) - 1
@@ -49,7 +50,7 @@ def	train_prediction(datas):
 	print(houseNames)
 	datas.drop('Hogwarts House', axis=1, inplace=True)
 	subjectColumns = datas
-	for iteration in range(30):
+	for iteration in range(40):
 		tmpthetas = minimizeCostFunction(houseColumns, subjectColumns, thetas, learningRate, size, nbr_house, nbr_subject, houseNames)
 	thetas = thetasNames + thetas	 
 	return thetas
@@ -61,8 +62,13 @@ def normalize(subjectDatas):
 		values = subjectDatas[subject].values
 		xmin = math.minimum(values)
 		xmax = math.maximum(values)
+		meanNormalize = (math.mean(values) - xmin) / (xmax - xmin)
 		for i in range(len(subjectDatas[subject].values)):
-			subjectDatas.loc[[i], [subject]] = (subjectDatas[subject][i] - xmin) / (xmax - xmin)
+			value = subjectDatas.iloc[i][subject]
+			if np.isnan(value):
+				subjectDatas.at[i, subject] = meanNormalize
+			else:
+				subjectDatas.at[i, subject] = (value - xmin) / (xmax - xmin)
 	return subjectDatas
 
 def main():
@@ -75,7 +81,7 @@ def main():
 		if (subjectDatas is None):
 			sys.exit(1)
 		datas = normalize(subjectDatas)
-		thetas = train_prediction(datas.dropna().reset_index(drop=True))
+		thetas = train_prediction(datas)
 		if (thetas == None):
 			print("csv file incorect.")
 			sys.exit(1)			
