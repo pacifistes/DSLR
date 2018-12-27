@@ -1,8 +1,6 @@
 #!~/.brew/bin/python
 from __future__ import division
 from functools import partial
-import multiprocessing
-import concurrent.futures
 import math as m
 import sys
 import csvTools as csv
@@ -13,15 +11,20 @@ import numpy as np
 g_featureColumns = ['Astronomy','Herbology','Divination','Muggle Studies','Ancient Runes','History of Magic']
 
 class	LogisticRegression:
-	def __init__(self, trainFilename, classifyColumn, featureColumns):
+	def __init__(self, trainFilename, classifyColumn, featureColumns, predictFilename=None):
 		self.trainFilename = trainFilename
+		self.predictFilename = predicFilename
 		self.classifyColumn = classifyColumn
 		self.featureColumns = list(featureColumns)
 		self.features = None
+		self.predicFeatures = None
 		self.classes = None
 		self.thetas = None
-		self.__learningRate = 0.1
-		self.__numberIteration = 3
+		self.__minimums = None
+		self.__maximums = None
+		self.__means = None
+		self.__learningRate = 0.3
+		self.__numberIteration = 250
 		self.__isInitDoneSuccessfully = False
 	
 	def __normalizeLambda(self, minimum, maximum):
@@ -38,6 +41,22 @@ class	LogisticRegression:
 			maximum = math.maximum(values)
 			mean = (math.mean(values) - minimum) / (maximum - minimum)
 			normalizeLambda = self.__normalizeLambda(minimum, maximum)
+			self.__minimums.append(minimum)
+			self.__maximums.append(maximum)
+			self.__means.append(mean)
+			func = partial(self.__applyNormalize ,mean, normalizeLambda)
+			newFeatures.update({feature : map(func, features[feature].values)})
+		newFeatures = pd.DataFrame(newFeatures)
+		return newFeatures
+
+	def __normalizePredictFile(self, features):
+		newFeatures = {}
+		for feature, iFeature in zip(features, range(features.shape[1])):
+			values = features[feature].values
+			minimum = self.__minimum[iFeature]
+			maximum = self.__maximum[iFeature]
+			mean = self.__mean[iFeature]
+			normalizeLambda = self.__normalizeLambda(minimum, maximum)
 			func = partial(self.__applyNormalize ,mean, normalizeLambda)
 			newFeatures.update({feature : map(func, features[feature].values)})
 		newFeatures = pd.DataFrame(newFeatures)
@@ -47,38 +66,39 @@ class	LogisticRegression:
 		return 1 / (1 + (m.e ** -value))
 
 	def __predict(self, thetas, values):
-		result = 0.0
-		for i in range(len(thetas)):
-			result += (thetas[i] * values[i])
+		values.insert(0, 1)
+		result = np.dot(thetas, values)
 		return self.__sigmoid(result)
+	
+	def __derivate(self, classNames, iClass, ifeature, line):
+		values = self.features.values[line].tolist()
+		result = self.__predict(self.thetas[iClass], values)
+		y = 1 if (self.classes[line] == classNames[iClass]) else 0
+		return (result - y) * values[ifeature]
 
-	def __getCost(self, line)
-		y = 0 + (self.classes[line] == className)
-		predict = self.__predict(self.thetas[iClass], self.features[iFeature][line])
-		return 
+	# def __getCost(self, classNames, iClass, line):
+	# 	predict = self.__predict(self.thetas[iClass], self.features.values[line].tolist())
+	# 	result = m.log10(predict) if (self.classes[line] == classNames[iClass]) else m.log10(1 - predict)
+	# 	return result * -1
 
-	def __getFeatureTheta()
-		theta = self.thetas[][] - ((sum(map(self.__getCost, self.features.shape[0])) \
-		* (-1 / self.features.shape[0])) * (self.__learningRate / self.features.shape[0]))
+	# def __getFeatureTheta(self, classNames, iClass, iFeature):
+	# 	getCost = partial(self.__getCost, classNames, iClass)
+	# 	cost = self.thetas[iClass][iFeature] + (math.mean(map(getCost, range(self.features.shape[0]))) * self.__learningRate)
+	# 	return theta
+
+	def __getFeatureTheta(self, classNames, iClass, iFeature):
+		derivate = partial(self.__derivate, classNames, iClass, iFeature)
+		theta = self.thetas[iClass][iFeature] -  (self.__learningRate * math.mean(map(derivate, range(self.features.shape[0]))))
 		return theta
 
-	def __getClassThetas(self, className):
-		getFeatureThetas = partial(self.__getFeatureThetas, className)
-		return map(getFeatureThetas, self.features)
+	def __getClassThetas(self, classNames, iClass):
+		getFeatureTheta = partial(self.__getFeatureTheta, classNames, iClass)
+		thetas = map(getFeatureTheta, range(self.features.shape[1] + 1))
+		return thetas
 
-	def	__minimizeCostFunction(self, classNames, nbrClass, nbrFeature, nbrLine):
-		self.thetas = map(self.getClassThetas, classNames)
-
-	# def	__minimizeCostFunction(self, classNames, nbrClass, nbrFeature, nbrLine):
-	# 	# return None
-	# 	for iClass, className in zip(range(nbrClass), classNames):
-	# 		for iFeature in range(nbrFeature):
-	# 			cost = 0
-	# 			for line in range(nbrLine):
-	# 				y = 0 + (self.classes[line] == className)
-	# 				predict = self.__predict(self.thetas[iClass], self.features[iFeature][line])
-	# 				cost = cost + (y * m.log10(predict) + (1 - y) * m.log10(1 - predict))
-	# 			self.thetas[iClass][iFeature] -= ((self.__learningRate / nbrLine) * ((-1 / nbrLine) * cost))
+	def	__gradientDescent(self, classNames, iClasses):
+		getClassThetas = partial(self.__getClassThetas, classNames)
+		self.thetas = map(getClassThetas, iClasses)
 
 	def setLearningRate(self, learningRate):
 		self.__learningRate = learningRate
@@ -86,13 +106,17 @@ class	LogisticRegression:
 	def setNumberIteration(self, numberIteration):
 		self.__numberIteration = numberIteration
 
-	@profile
 	def init(self):
 		datas = csv.readCSVFile(self.trainFilename , ',')
 		if (datas is None):
 			return False
 		try:
 			self.features = self.__normalize(datas[self.featureColumns])
+			if (self.predictFilename != None):
+				datas = csv.readCSVFile(self.predicFilename , ',')
+				if (datas is None):
+					return False
+				self.predicFeatures = self.__normalizePredictFile(datas[self.featureColumns])
 		except Exception:
 			print("One or multiple columns beetween: ", ", ".join(self.featureColumns), " doesn't exits")
 		try:
@@ -108,90 +132,46 @@ class	LogisticRegression:
 		if (self.__isInitDoneSuccessfully is False):
 			print("The function init must return True before call the function train")
 			return False
-		nbrFeature = len(self.features.shape[1])
 		classNames = self.classes.unique()
 		nbrClass = len(classNames)
-		nbrLine = self.feature.shape[0]
-		self.thetas = [[0.0 for _ in range(nbrFeature)] for _ in range(nbrClass)]
+		self.thetas = [[0.0 for _ in range(self.features.shape[1] + 1)] for _ in range(nbrClass)]
 		for iteration in range(self.__numberIteration):
-			self.__minimizeCostFunction(classNames, nbrClass, nbrFeature, nbrLine)
-		self.thetas = [[feature for feature in self.featureColumns]] + self.thetas
+			self.__gradientDescent(classNames, range(nbrClass))
+		self.thetas = [["theta0"] + [feature for feature in self.featureColumns]] + self.thetas
+		self.thetas[0].insert(0, self.classifyColumn)
+		for className, iClass in zip(classNames, range(nbrClass)):
+			self.thetas[iClass + 1].insert(0, className)
 		return True
-		
 
-# @profile
+	def	predictAll(self):
+		predicts = []
+		if (self.__isInitDoneSuccessfully is False):
+			print("The function init must return True before call the function train")
+			return None
+		if (self.predictFilename is None):
+			print("Add the predict filename in constructor")
+			return None
+		datas = csv.readCSVFile(self.predicFilename , ',')
+		if (datas is None):
+			return False
+		thetas = datas['thetas0' + self.featureColumns]
+		print(thetas)
+
+	def writeThetas(self):
+		if (self.__isInitDoneSuccessfully is False):
+			print("The function init must return True before call the function train")
+			return
+		csv.writeCSVFile('thetas.csv', self.thetas)
+
+
 def main():
 	vlen = len(sys.argv)
 	if (vlen == 2):
 		logistic = LogisticRegression('ressources/dataset_train.csv', 'Hogwarts House', g_featureColumns)
-		if (logistic.init()):
-			logistic.train()
-			# logistic.writeThetas
-		# datas = csv.readCSVFile(sys.argv[1], ',')
-		# if (datas is None):
-		# 	sys.exit(1)
-		# subjectDatas = csv.dropColumns(datas, csv.ignoredSubjects)
-		# if (subjectDatas is None):
-		# 	sys.exit(1)
-		# datas = normalize(subjectDatas)
-		# sys.exit(1)
-		# thetas = train_prediction(datas)
-		# if (thetas == None):
-		# 	print("csv file incorect.")
-		# 	sys.exit(1)			
-		# csv.writeCSVFile('thetas.csv', thetas)
+		if (logistic.init() and logistic.train()):
+			logistic.writeThetas()
 	else:
 		print("Error script : python logreg_train.py file.")
 
 if __name__ == "__main__":
 	main()
-
-
-
-# def normalize6(L, values , nbr_line):
-# 		minimum = math.maximum(values)
-# 		maximum = math.minimum(values)
-# 		mean = (math.mean(values) - minimum) / (maximum - minimum)
-# 		my = mylambda(minimum, maximum)
-# 		L.append(getValue3(mean, my, values[line]) \
-# 		for line in range(nbr_line))
-
-# def testManager(subjectDatas):
-# 	with multiprocessing.Manager() as manager:
-# 		L = manager.list()  # <-- can be shared between processes.
-# 		processes = []
-# 		for subject in subjectDatas:
-# 			p = multiprocessing.Process(target=normalize6, args=(L,subjectDatas[subject], subjectDatas.shape[0]))  # Passing the list
-# 			p.start()
-# 			processes.append(p)
-# 		for p in processes:
-# 			p.join()
-# 	return L
-
-# def testPool2(subjectDatas):
-# 	num_processes = multiprocessing.cpu_count()
-# 	with concurrent.futures.ProcessPoolExecutor(num_processes) as pool:
-# 		result = []
-# 		for subject in subjectDatas:
-# 			values = subjectDatas[subject].values
-# 			minimum = math.maximum(values)
-# 			maximum = math.minimum(values)
-# 			mean = (math.mean(values) - minimum) / (maximum - minimum)
-# 			func = partial(getValue2,mean, minimum, maximum)
-# 			result.append(list(pool.map(func, values)))
-# 			break
-# 		return result
-
-# def testPool3(subjectDatas):
-# 	num_processes = multiprocessing.cpu_count()
-# 	with concurrent.futures.ProcessPoolExecutor(num_processes) as pool:
-# 		result = []
-# 		for subject in subjectDatas:
-# 			values = subjectDatas[subject].values
-# 			minimum = math.maximum(values)
-# 			maximum = math.minimum(values)
-# 			mean = (math.mean(values) - minimum) / (maximum - minimum)
-# 			my = mylambda(minimum, maximum)
-# 			func = partial(getValue3,mean, my)
-# 			result.append(list(pool.map(func, values)))
-# 		return result
