@@ -16,13 +16,20 @@ if __name__ == '__main__':
 	
 	totalTrueTable = [0 for _ in range(4)]
 	totalMeTable = [0 for _ in range(4)]
+	totalEachHouse = [0 for _ in range(4)]
+
 	for true, predict in zip(y_true, y_pred):
 		if (true[0] == predict[0]):
 			totalMeTable[predict[0]] += 1
 			totalTrue += 1
 		totalTrueTable[true[0]] += 1
+		totalEachHouse[predict[0]] += 1
 	print('prediction :' + str(totalTrue / len(y_true)))
-	print('Grynfondor :' + str(totalMeTable[0]) + "/" + str(totalTrueTable[0]))
+	print('\nGrynfondor :' + str(totalMeTable[0]) + "/" + str(totalTrueTable[0]))
 	print('Hufflepuff :' + str(totalMeTable[1]) + "/" + str(totalTrueTable[1]))
 	print('Ravenclaw :' + str(totalMeTable[2]) + "/" + str(totalTrueTable[2]))
 	print('Slytherin :' + str(totalMeTable[3]) + "/" + str(totalTrueTable[3]))
+	print('\nGrynfondor :' + str(totalEachHouse[0]))
+	print('Hufflepuff :' + str(totalEachHouse[1]))
+	print('Ravenclaw :' + str(totalEachHouse[2]))
+	print('Slytherin :' + str(totalEachHouse[3]))
