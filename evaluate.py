@@ -1,5 +1,5 @@
 from __future__ import division
-import numpy as np
+# import numpy as np
 import pandas as pd
 
 
@@ -12,10 +12,17 @@ if __name__ == '__main__':
 	houses = {'Gryffindor': 0, 'Hufflepuff': 1, 'Ravenclaw': 2, 'Slytherin': 3}
 	y_true = truths.replace(houses).values
 	y_pred = predictions.replace(houses).values
-	print(len(y_true))
-	print(len(y_pred))
 	totalTrue = 0
+	
+	totalTrueTable = [0 for _ in range(4)]
+	totalMeTable = [0 for _ in range(4)]
 	for true, predict in zip(y_true, y_pred):
-		if (true == predict):
+		if (true[0] == predict[0]):
+			totalMeTable[predict[0]] += 1
 			totalTrue += 1
+		totalTrueTable[true[0]] += 1
 	print('prediction :' + str(totalTrue / len(y_true)))
+	print('Grynfondor :' + str(totalMeTable[0]) + "/" + str(totalTrueTable[0]))
+	print('Hufflepuff :' + str(totalMeTable[1]) + "/" + str(totalTrueTable[1]))
+	print('Ravenclaw :' + str(totalMeTable[2]) + "/" + str(totalTrueTable[2]))
+	print('Slytherin :' + str(totalMeTable[3]) + "/" + str(totalTrueTable[3]))
