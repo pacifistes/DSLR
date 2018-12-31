@@ -55,9 +55,6 @@ class	LogisticRegression:
 		classNames = self.classes.unique()
 		for values in self.predictFeatures.values:
 			results = [self.predict(lineThetas, values.tolist()) for lineThetas in thetas.values]
-			# print(results)
-			# print(classNames)
-			# sys.exit()
 			predicts.append(classNames[results.index(max(results))])
 		
 		dataframe = {}
@@ -107,21 +104,15 @@ class	LogisticRegression:
 		result = m.log10(predict) if (self.classes[line] == classNames[iClass]) else m.log10(1 - predict)
 		return result * -1
 
-	def	sigmoid(self, value):
-		return 1 / (1 + (m.e ** -value))
-
 	def predict(self, thetas, values):
-		# values.insert(0, 1)
-		# result = np.dot(thetas, values)
-		# return self.sigmoid(result)
 		return 1 / (1 + (m.e ** -np.dot(thetas, values)))
 
-	def	gradientDescent2(self, classNames):
+	def	gradientDescent(self, classNames):
 		self.thetas = [[
-		self.thetas[iClass][iFeature] -  (self.learningRate * math.mean(
+		self.thetas[iClass][iFeature] - (self.learningRate * math.mean(
 		[((self.predict(self.thetas[iClass], values.tolist()) - (1 if (classtmp == className) else 0)) * (values[iFeature]))
-		for classtmp, values in zip(self.classes.values,self.features.values)])) \
-		for iFeature in range(self.features.shape[1])]\
+		for classtmp, values in zip(self.classes.values,self.features.values)]))
+		for iFeature in range(self.features.shape[1])]
 		for iClass, className in enumerate(classNames)]
 
 	def normalizeLambda(self, minimum, maximum):
@@ -170,12 +161,12 @@ class	LogisticRegression:
 		self.thetas = [[0.0 for _ in range(self.features.shape[1])] for _ in range(nbrClass)]
 		for iteration in range(self.numberIteration):
 			if (iteration % self.costIteration == 0):
-				self.costs.append(math.mean([math.mean(map(getCost, range(self.features.shape[0]))) \
-				for getCost in [partial(self.getCost, classNames, iClass) \
+				self.costs.append(math.mean([math.mean(map(getCost, range(self.features.shape[0])))
+				for getCost in [partial(self.getCost, classNames, iClass)
 				for iClass in range(len(classNames))]]))
-				if (iteration != 0 and abs(self.costs[len(self.costs) - 2] - self.costs[len(self.costs) - 1]) < 0.01):
+				if (iteration != 0 and abs(self.costs[len(self.costs) - 2] - self.costs[len(self.costs) - 1]) < 0.005):
 					break
-			self.gradientDescent2(classNames)
+			self.gradientDescent(classNames)
 		
 		self.thetas = [["theta0"] + [feature for feature in self.featureColumns]] + self.thetas
 		self.thetas[0].insert(0, self.classifyColumn)

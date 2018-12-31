@@ -6,7 +6,6 @@ g_featureColumns = ['Astronomy','Herbology','Divination','Muggle Studies','Ancie
 
 def main():
 	logistic = LogisticRegression('ressources/dataset_train.csv', 'Hogwarts House', g_featureColumns, 'ressources/dataset_test.csv')
-	# logistic = LogisticRegression('ressources/data_plop.csv', 'Passed', g_plop, 'ressources/dataset_test.csv')
 	if (logistic.initTrain() is True):
 		logistic.setLearningRate(0.1)
 		logistic.setCostIteration(50)
