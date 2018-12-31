@@ -3,7 +3,6 @@ from logistic_regression import LogisticRegression
 import sys
 
 g_featureColumns = ['Astronomy','Herbology','Divination','Muggle Studies','Ancient Runes','History of Magic']
-g_plop = ['Studied','Slept']
 
 def main():
 	logistic = LogisticRegression('ressources/dataset_train.csv', 'Hogwarts House', g_featureColumns, 'ressources/dataset_test.csv')
@@ -11,7 +10,7 @@ def main():
 	if (logistic.initTrain() is True):
 		logistic.setLearningRate(0.1)
 		logistic.setCostIteration(50)
-		logistic.setNumberIteration(1000)
+		logistic.setNumberIteration(500)
 		logistic.train()
 		if (len(sys.argv) == 2 and sys.argv[1] == "-displayCost"):
 			print("preparation du display de la function cost")

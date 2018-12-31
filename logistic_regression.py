@@ -1,7 +1,7 @@
 #!~/.brew/bin/python
 from __future__ import division
 from functools import partial
-import matplotlib.pyplot as plt
+# import matplotlib.pyplot as plt
 import math as m
 import csvTools as csv
 import mathTools as math
@@ -97,7 +97,7 @@ class	LogisticRegression:
 		except Exception:
 			print("One or multiple columns beetween: ", ", ".join(self.featureColumns), " doesn't exits")
 		self.predictFeatures = self.normalizePredictFile(trainFeatures, predictFeature)
-		
+		self.predictFeatures.insert(0, 'theta0', [1.0 for _ in range(self.predictFeatures.shape[0])])
 		if (self.predictFeatures is not None):
 			self.initPredictDone = True
 		return self.initPredictDone
@@ -111,16 +111,17 @@ class	LogisticRegression:
 		return 1 / (1 + (m.e ** -value))
 
 	def predict(self, thetas, values):
-		values.insert(0, 1)
-		result = np.dot(thetas, values)
-		return self.sigmoid(result)
+		# values.insert(0, 1)
+		# result = np.dot(thetas, values)
+		# return self.sigmoid(result)
+		return 1 / (1 + (m.e ** -np.dot(thetas, values)))
 
 	def	gradientDescent2(self, classNames):
 		self.thetas = [[
 		self.thetas[iClass][iFeature] -  (self.learningRate * math.mean(
-		[((self.predict(self.thetas[iClass], values.tolist()) - (1 if (classtmp == className) else 0)) * (1 if (iFeature == 0) else values[iFeature - 1]))
+		[((self.predict(self.thetas[iClass], values.tolist()) - (1 if (classtmp == className) else 0)) * (values[iFeature]))
 		for classtmp, values in zip(self.classes.values,self.features.values)])) \
-		for iFeature in range(self.features.shape[1] + 1)]\
+		for iFeature in range(self.features.shape[1])]\
 		for iClass, className in enumerate(classNames)]
 
 	def normalizeLambda(self, minimum, maximum):
@@ -148,6 +149,7 @@ class	LogisticRegression:
 			return False
 		try:
 			self.features = self.normalize(datas[self.featureColumns])
+			self.features.insert(0, 'theta0', [1.0 for _ in range(self.features.shape[0])])
 		except Exception:
 			print("One or multiple columns beetween: ", ", ".join(self.featureColumns), " doesn't exits")
 		try:
@@ -165,13 +167,13 @@ class	LogisticRegression:
 			return
 		classNames = self.classes.unique()
 		nbrClass = len(classNames)
-		self.thetas = [[0.0 for _ in range(self.features.shape[1] + 1)] for _ in range(nbrClass)]
+		self.thetas = [[0.0 for _ in range(self.features.shape[1])] for _ in range(nbrClass)]
 		for iteration in range(self.numberIteration):
 			if (iteration % self.costIteration == 0):
 				self.costs.append(math.mean([math.mean(map(getCost, range(self.features.shape[0]))) \
 				for getCost in [partial(self.getCost, classNames, iClass) \
 				for iClass in range(len(classNames))]]))
-				if (iteration != 0 and abs(self.costs[len(self.costs) - 2] - self.costs[len(self.costs) - 1]) < 0.0001):
+				if (iteration != 0 and abs(self.costs[len(self.costs) - 2] - self.costs[len(self.costs) - 1]) < 0.01):
 					break
 			self.gradientDescent2(classNames)
 		
@@ -184,8 +186,9 @@ class	LogisticRegression:
 		self.thetas.to_csv('thetas.csv', sep=',', index=False)
 
 	def displayCost(self):
-		if (len(self.costs) > 0):
-			plt.plot([self.costIteration * i for i in range(len(self.costs))], self.costs, 'ro')
-		plt.xlabel('iteration')
-		plt.ylabel('cost')
-		plt.show()
+		return
+		# if (len(self.costs) > 0):
+		# 	plt.plot([self.costIteration * i for i in range(len(self.costs))], self.costs, 'ro')
+		# plt.xlabel('iteration')
+		# plt.ylabel('cost')
+		# plt.show()
