@@ -7,7 +7,7 @@ import numpy as np
 houseNames = ['Slytherin', 'Hufflepuff', 'Gryffindor', 'Ravenclaw']
 colors = ["#33c47f", "#A061D1", "#FF6950", "#4180db"]
 notArithmetiqueSubjects = ['Index','First Name','Last Name','Birthday','Best Hand']
-ignoredSubjects = nonArithmetiqueSubjects.append('Arithmancy', 'Defense Against the Dark Arts', 'Care of Magical Creatures', 'Transfiguration')
+ignoredSubjects = notArithmetiqueSubjects + ['Arithmancy', 'Defense Against the Dark Arts', 'Care of Magical Creatures', 'Transfiguration', 'Potions', 'Flying', 'Charms']
 
 # Function readCSVFile
 # Params : (String) fileName of the csv file ; (Char) delimiter
@@ -29,7 +29,7 @@ def dropColumns(datas, columns):
 	try:
 		datas.drop(columns, axis=1, inplace=True)
 	except Exception:
-		print("One or multiple column beetween:", ", ".join(columns), "colum doesn't exits", sep=" ")
+		print("One or multiple column beetween:", ", ".join(columns), "colum doesn't exits")
 		return None
 	return datas
 
@@ -59,23 +59,3 @@ def getSubjectValueByHouse(datas):
 			tmpList.append(dropNa(datas[datas['Hogwarts House'].isin({house})][data].values))
 		subjectsByHouse.append(tmpList)
 	return [subjectNames, subjectsByHouse]
-
-
-# Function writeCSVFile
-# Params : (String) fileName, [[name1, name2, ...], [value1, value2, ...], [value1, value2, ...], ...]
-# Return : nothing
-def writeCSVFile(fileName, datas):
-	try:
-		with open(fileName, mode='w+') as csv_file:
-			fieldnames = datas[0]
-			writer = csv.DictWriter(csv_file, fieldnames=fieldnames)
-			writer.writeheader()
-			dictionnary = {}
-			for i in range(0, len(datas)):
-				if (i != 0):
-					dictionnary.update({fieldnames[i] : datas[i]})
-			writer.writerow(dictionnary)
-	except Exception:
-		print 'The params must be a float[2].'
-	except IOError:
-		print 'The file thetas.csv isn\'t writable.'

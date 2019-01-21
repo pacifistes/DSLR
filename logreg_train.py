@@ -1,43 +1,19 @@
 #!~/.brew/bin/python
-import math
+from logistic_regression import LogisticRegression
+import sys
 
-# Function sigmoid
-# Params : (Float) value
-# Return : reader a value between 0 and 1
-def	sigmoid(value):
-	return 1 / (1 + math.e ** -value)
+g_featureColumns = ['Astronomy','Herbology','Divination','Muggle Studies','Ancient Runes','History of Magic']
 
-def costFunction(datas):
-	cost = 0
-	m = len(datas)
-	for data in datas:
-		y = data[1]
-		xSigmoid = sigmoid(data[0] * theta)
-		cost = cost + (y * math.log10(xSigmoid) + (1 - y) * math.log10(1 - xSigmoid))
-	return (-1 / m) * cost
+def main():
+	logistic = LogisticRegression('ressources/dataset_train.csv', 'Hogwarts House', g_featureColumns, 'ressources/dataset_test.csv')
+	if (logistic.initTrain() is True):
+		logistic.setLearningRate(0.1)
+		logistic.setCostIteration(50)
+		logistic.setNumberIteration(500)
+		logistic.train()
+		if (len(sys.argv) == 2 and sys.argv[1] == "-displayCost"):
+			print("preparation du display de la function cost")
+			logistic.displayCost()
 
-def	minimizeCostFunction(datas, theta):
-	learningRate = 0.001
-	m = len(datas)
-	cost = 0
-
-	for data in datas:
-		x = data[0]
-		y = data[1]
-		cost = cost + ((sigmoid(theta * x) - y) * x)
-	return theta - ((learningRate / m) * cost)
-
-# Function logit
-# Return: hypothesis of linear Regression
-def	logit(theta0, theta1, x)
-	return theta0 + (theta1 * x)
-
-def	findTheta(datas):
-	theta = 0.0
-	thetaPres = 0.000001
-	for iteration in range(0,100000000):
-		tmpTheta = minimizeCostFunction(datas, theta)
-		if (abs(theta - tmpTheta) < thetaPres):
-			break
-		theta = tmpTheta
-	return theta
+if __name__ == "__main__":
+	main()

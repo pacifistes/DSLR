@@ -7,11 +7,7 @@ def count(values):
 	return np.count_nonzero(~np.isnan(values))
 
 def mean(values):
-	vsum = 0.00
-	for value in values:
-		if (~np.isnan(value)):
-			vsum += value
-	return vsum/count(values)
+	return np.nansum(values) / count(values)
 
 def sqrt(number):
 	precision = 5
@@ -33,30 +29,25 @@ def std(values):
 	vsum = 0
 	meanValue = mean(values)
 	for value in values:
-		if (~np.isnan(value)):
+		if (value == value):
 			vsum += ((value - meanValue) ** 2) 
 	result = sqrt((1 / count(values)) * vsum)
 	return result
 
+
 def minimum(values):
-	vmin = None
+	result = np.nan
 	for value in values:
-		if (~np.isnan(value)):
-			if (vmin is None):
-				vmin = value
-			elif (value < vmin):
-				vmin = value
-	return vmin
+		if ((result != result and value == value) or (value == value and value < result)):
+			result = value
+	return result
 
 def maximum(values):
-	vmax = None
+	result = np.nan
 	for value in values:
-		if (~np.isnan(value)):
-			if (vmax is None):
-				vmax = value
-			elif (value > vmax):
-				vmax = value
-	return vmax
+		if ((result != result and value == value) or (value == value and value > result)):
+			result = value
+	return result
 
 def percentile(values, percentile):
 	number = int(percentile * count(values))
@@ -65,7 +56,7 @@ def percentile(values, percentile):
 	for value in values:
 		if (index == number):
 			return value
-		if (~np.isnan(value)):
+		if (value == value):
 			index += 1
 	return 0
 
