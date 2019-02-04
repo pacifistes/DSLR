@@ -1,7 +1,7 @@
 #!~/.brew/bin/python
 from __future__ import division
 from functools import partial
-# import matplotlib.pyplot as plt
+import matplotlib.pyplot as plt
 import math as m
 import csvTools as csv
 import mathTools as math
@@ -179,9 +179,8 @@ class	LogisticRegression:
 		self.thetas.to_csv('thetas.csv', sep=',', index=False)
 
 	def displayCost(self):
-		return
-		# if (len(self.costs) > 0):
-		# 	plt.plot([self.costIteration * i for i in range(len(self.costs))], self.costs, 'ro')
-		# plt.xlabel('iteration')
-		# plt.ylabel('cost')
-		# plt.show()
+		if (len(self.costs) > 0):
+			plt.plot([self.costIteration * i for i in range(len(self.costs))], self.costs, 'ro')
+		plt.xlabel('iteration')
+		plt.ylabel('cost')
+		plt.show()
