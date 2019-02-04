@@ -65,12 +65,13 @@ class	LogisticRegression:
 		newFeatures = {}
 		for feature in trainFeatures:
 			values = trainFeatures[feature].values
-			minimum = math.minimum(values)
-			maximum = math.maximum(values)
-			mean = (math.mean(values) - minimum) / (maximum - minimum)
+			value = math.Subject(values)
+			minimum = value.minimum()
+			maximum = value.maximum()
+			mean = (value.mean() - minimum) / (maximum - minimum)
 			normalizeLambda = self.normalizeLambda(minimum, maximum)
 			func = partial(self.applyNormalize ,mean, normalizeLambda)
-			newFeatures.update({feature : map(func, predictFeature[feature].values)})
+			newFeatures.update({feature : list(map(func, predictFeature[feature].values))})
 		newFeatures = pd.DataFrame(newFeatures)
 		return newFeatures
 
@@ -125,12 +126,13 @@ class	LogisticRegression:
 		newFeatures = {}
 		for feature in features:
 			values = features[feature].values
-			minimum = math.minimum(values)
-			maximum = math.maximum(values)
-			mean = (math.mean(values) - minimum) / (maximum - minimum)
+			value = math.Subject(values)
+			minimum = value.minimum()
+			maximum = value.maximum()
+			mean = (value.mean() - minimum) / (maximum - minimum)
 			normalizeLambda = self.normalizeLambda(minimum, maximum)
 			func = partial(self.applyNormalize ,mean, normalizeLambda)
-			newFeatures.update({feature : map(func, features[feature].values)})
+			newFeatures.update({feature : list(map(func, features[feature].values))})
 		newFeatures = pd.DataFrame(newFeatures)
 		return newFeatures
 
@@ -161,7 +163,7 @@ class	LogisticRegression:
 		self.thetas = [[0.0 for _ in range(self.features.shape[1])] for _ in range(nbrClass)]
 		for iteration in range(self.numberIteration):
 			if (iteration % self.costIteration == 0):
-				self.costs.append(math.mean([math.mean(map(getCost, range(self.features.shape[0])))
+				self.costs.append(math.mean([math.mean(list(map(getCost, range(self.features.shape[0]))))
 				for getCost in [partial(self.getCost, classNames, iClass)
 				for iClass in range(len(classNames))]]))
 				if (iteration != 0 and abs(self.costs[len(self.costs) - 2] - self.costs[len(self.costs) - 1]) < 0.005):

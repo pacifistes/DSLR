@@ -1,13 +1,64 @@
 #!~/.brew/bin/python
 from __future__ import division
 import numpy as np
+import pandas as pd
 import math
 
-def count(values):
-	return np.count_nonzero(~np.isnan(values))
 
-def mean(values):
-	return np.nansum(values) / count(values)
+
+class Subject:
+
+	def __init__(self, values):
+		self.values = values
+
+	def count(self):
+		return np.count_nonzero(~pd.isnull(self.values))
+
+	def mean(self):
+		return np.nansum(self.values) / self.count()
+
+	def std(self):
+		vsum = 0
+		meanValue = self.mean()
+		for value in self.values:
+			if (value == value):
+				vsum += ((value - meanValue) ** 2) 
+		result = sqrt((1 / self.count()) * vsum)
+		return result
+
+	def minimum(self):
+		result = np.nan
+		for value in self.values:
+			if ((result != result and value == value) or (value == value and value < result)):
+				result = value
+		return result
+
+	def maximum(self):
+		result = np.nan
+		for value in self.values:
+			if ((result != result and value == value) or (value == value and value > result)):
+				result = value
+		return result
+
+	def percentile(self, percentile):
+		number = int(percentile * self.count())
+		index = 0
+		self.values.sort()
+		for value in self.values:
+			if (index == number):
+				return value
+			if (value == value):
+				index += 1
+		return 0
+
+	def quart(self):
+		return self.percentile(0.25)
+
+	def half(self):
+		return self.percentile(0.5)
+
+	def threeQuarts(self):
+		return self.percentile(0.75)
 
 def sqrt(number):
 	precision = 5
@@ -25,46 +76,10 @@ def sqrt(number):
 		increment = increment / 10
 	return value
 
-def std(values):
-	vsum = 0
-	meanValue = mean(values)
-	for value in values:
-		if (value == value):
-			vsum += ((value - meanValue) ** 2) 
-	result = sqrt((1 / count(values)) * vsum)
-	return result
+
+def mean(values):
+	return np.nansum(values) / count(values)
 
 
-def minimum(values):
-	result = np.nan
-	for value in values:
-		if ((result != result and value == value) or (value == value and value < result)):
-			result = value
-	return result
-
-def maximum(values):
-	result = np.nan
-	for value in values:
-		if ((result != result and value == value) or (value == value and value > result)):
-			result = value
-	return result
-
-def percentile(values, percentile):
-	number = int(percentile * count(values))
-	index = 0
-	values.sort()
-	for value in values:
-		if (index == number):
-			return value
-		if (value == value):
-			index += 1
-	return 0
-
-def quart(values):
-	return percentile(values, 0.25)
-
-def half(values):
-	return percentile(values, 0.5)
-
-def threeQuarts(values):
-	return percentile(values, 0.75)
+def count(values):
+	return np.count_nonzero(~pd.isnull(values))

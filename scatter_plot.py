@@ -10,7 +10,7 @@ def main():
 		datas = csv.readCSVFile(sys.argv[1], ',')
 		if (datas is None):
 			sys.exit(1)
-		subjectDatas = csv.dropColumn(datas, csv.notArithmetiqueSubjects)
+		subjectDatas = csv.dropColumns(datas, csv.notArithmetiqueSubjects)
 		if (subjectDatas is None):
 			sys.exit(1)
 		sns.relplot(x="Astronomy", y="Defense Against the Dark Arts", hue="Hogwarts House", hue_order=csv.houseNames, palette=csv.colors, data=subjectDatas)

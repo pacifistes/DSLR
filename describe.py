@@ -6,14 +6,15 @@ import sys
 
 def describeColumn(values):
 	result = []
-	result.append(math.count(values))
-	result.append(math.mean(values))
-	result.append(math.std(values))
-	result.append(math.minimum(values))
-	result.append(math.quart(values))
-	result.append(math.half(values))
-	result.append(math.threeQuarts(values))
-	result.append(math.maximum(values))
+	value = math.Subject(values)
+	result.append(value.count())
+	result.append(value.mean())
+	result.append(value.std())
+	result.append(value.minimum())
+	result.append(value.quart())
+	result.append(value.half())
+	result.append(value.threeQuarts())
+	result.append(value.maximum())
 	return result
 	# return [math.count(values), math.mean(values), math.std(values), math.minimum(values), math.quart(values), math.half(values), math.threeQuarts(values), math.maximum(values)]
 
@@ -30,21 +31,21 @@ def describe(datas):
 
 def main():
 	vlen = len(sys.argv)
-	if (vlen == 2 or (vlen == 3 and sys.argv[1] == "-byHouse")):
+	if (vlen == 2 or (vlen == 3 and sys.argv[1] == "-all")):
 		datas = csv.readCSVFile(sys.argv[vlen - 1], ',')
 		if (datas is None):
 			sys.exit(1)
 		subjectDatas = csv.dropColumns(datas, csv.notArithmetiqueSubjects)
 		if (subjectDatas is None):
 			sys.exit(1)
-		# print subjectDatas.describe()
+		# print(subjectDatas.describe())
 		print("Describe general:\n{}\n".format(describe(subjectDatas)))
 		if (vlen == 3):
 			for house in csv.houseNames:
 				print("Describe {}:\n{}\n".format(house, describe(subjectDatas.loc[subjectDatas['Hogwarts House'].isin({house})])))
 
 	else:
-		print('Error script : python describe.py -byHouse file.')
+		print('Error script : python describe.py [-all] file.')
 
 if __name__ == "__main__":
 	main()
